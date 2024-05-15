@@ -1,46 +1,60 @@
-    .section .text
-    .global _start
-    .align  1
-    .type   _start, @function
-
+.global _start
 _start:
-    # Initial setup
-    li      sp, 0x10000   
-    li      t0, 0x10012000  
+    li a0, 0x2200 # MSTATUS_VS & (MSTATUS_VS >> 1)
+    csrs mstatus, a0
+    csrwi vcsr, 0
 
-    # Vector operation setup
-    li      a0, 0x400
-    li      a1, 0xc3
-    li      a2, 0x10
-    vsetvl  x0, a0, a1
-    lui     x30, 0x1000
-    auipc   x31, 0
+    la sp, __stacktop
 
-    # Load data into vector register
-ld_data:
-    vle32.v v1, (x30)
+    // no ra to save
+    call test
 
-crypto_test:
-    vandn.vv v2, v1, v1
-    vbrev.v  v3, v1
-    vbrev8.v v4, v1
-    vrev8.v  v5, v1
-    vclz.v   v6, v1
-    vctz.v   v7, v1
-    vcpop.v  v8, v1
-    vrol.vv  v9, v1, v1
-    vror.vv  v10, v1, v1
-    vwsll.vv v11, v1, v1
+    // exit
+    li a0, 0x10000000
+    li a1, -1
+    sw a1, 4(a0)
+    csrwi 0x7cc, 0
+
+    .p2align 2
+
+.global test
+test:
+    addi x1, x1, 1
+    li a0, 0x400
+    li a1, 0xc3
+    li a2, 0x10
+    vsetvl x0, a0, a1
+    lui x30, 1
+    auipc x31, 0
+
+add_test:
+    vadd.vi v0, v0, 10
+    vadd.vi v16, v8, 11, v0.t
+    vandn.vv v8, v16, v0
+    vadd.vi v16, v8, 7, v0.t
+    vadd.vx v8, v16, x1
+
+chaining_test:
+    vadd.vx v24, v16, x1
+    vxor.vi v8, v24, 7
+    vsll.vi v16, v8, 1
+
+ld_test:
+    vle8.v v16, (x30)
 
 loop:
     addi a2, a2, -1
-    bnez a2, crypto_test       # Loop until a2 is 0
+    bnez a2, add_test
 
-    # Read the machine cycle counter for performance measurement
+    # read cycles
     csrr t0, mcycle
 
-    # Return to caller - Assume the return address is in ra (x1)
-    jalr x0, 0(x1)
+    ret
 
-.size _start, .-_start
+will_not_be_executed:
+    vadd.vv v2, v1, v1
 
+
+.global __stacktop
+__stacktop:
+    .space 4096  # Reserve 4KB for the stack

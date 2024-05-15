@@ -1,36 +1,53 @@
 
-/home/hassan/crypto_test:     file format elf64-littleriscv
+/home/hassan/temporary/crypto_test:     file format elf64-littleriscv
 
 
 Disassembly of section .text:
 
 0000000080000000 <_start>:
-    80000000:	00010137          	lui	sp,0x10
-    80000004:	100122b7          	lui	t0,0x10012
-    80000008:	40000513          	li	a0,1024
-    8000000c:	0c300593          	li	a1,195
-    80000010:	4641                	li	a2,16
-    80000012:	80b57057          	vsetvl	zero,a0,a1
-    80000016:	01000f37          	lui	t5,0x1000
-    8000001a:	00000f97          	auipc	t6,0x0
+    80000000:	6509                	lui	a0,0x2
+    80000002:	2005051b          	addiw	a0,a0,512 # 2200 <_start-0x7fffde00>
+    80000006:	30052073          	csrs	mstatus,a0
+    8000000a:	00f05073          	csrwi	vcsr,0
+    8000000e:	00003117          	auipc	sp,0x3
+    80000012:	ff210113          	addi	sp,sp,-14 # 80003000 <__stacktop>
+    80000016:	012000ef          	jal	80000028 <test>
+    8000001a:	10000537          	lui	a0,0x10000
+    8000001e:	55fd                	li	a1,-1
+    80000020:	c14c                	sw	a1,4(a0)
+    80000022:	7cc05073          	csrwi	0x7cc,0
+    80000026:	0001                	nop
 
-000000008000001e <ld_data>:
-    8000001e:	020f6087          	vle32.v	v1,(t5)
+0000000080000028 <test>:
+    80000028:	0085                	addi	ra,ra,1
+    8000002a:	40000513          	li	a0,1024
+    8000002e:	0c300593          	li	a1,195
+    80000032:	4641                	li	a2,16
+    80000034:	80b57057          	vsetvl	zero,a0,a1
+    80000038:	6f05                	lui	t5,0x1
+    8000003a:	00000f97          	auipc	t6,0x0
 
-0000000080000022 <crypto_test>:
-    80000022:	06108157          	vandn.vv	v2,v1,v1
-    80000026:	4a1521d7          	vbrev.v	v3,v1
-    8000002a:	4a142257          	vbrev8.v	v4,v1
-    8000002e:	4a14a2d7          	vrev8.v	v5,v1
-    80000032:	4a162357          	vclz.v	v6,v1
-    80000036:	4a16a3d7          	vctz.v	v7,v1
-    8000003a:	4a172457          	vcpop.v	v8,v1
-    8000003e:	561084d7          	vrol.vv	v9,v1,v1
-    80000042:	52108557          	vror.vv	v10,v1,v1
-    80000046:	d61085d7          	vwsll.vv	v11,v1,v1
+000000008000003e <add_test>:
+    8000003e:	02053057          	vadd.vi	v0,v0,10
+    80000042:	0085b857          	vadd.vi	v16,v8,11,v0.t
+    80000046:	07000457          	vandn.vv	v8,v16,v0
+    8000004a:	0083b857          	vadd.vi	v16,v8,7,v0.t
+    8000004e:	0300c457          	vadd.vx	v8,v16,ra
 
-000000008000004a <loop>:
-    8000004a:	167d                	addi	a2,a2,-1
-    8000004c:	fa79                	bnez	a2,80000022 <crypto_test>
-    8000004e:	b00022f3          	csrr	t0,mcycle
-    80000052:	00008067          	ret
+0000000080000052 <chaining_test>:
+    80000052:	0300cc57          	vadd.vx	v24,v16,ra
+    80000056:	2f83b457          	vxor.vi	v8,v24,7
+    8000005a:	9680b857          	vsll.vi	v16,v8,1
+
+000000008000005e <ld_test>:
+    8000005e:	020f0807          	vle8.v	v16,(t5)
+
+0000000080000062 <loop>:
+    80000062:	167d                	addi	a2,a2,-1
+    80000064:	fe69                	bnez	a2,8000003e <add_test>
+    80000066:	b00022f3          	csrr	t0,mcycle
+    8000006a:	8082                	ret
+
+000000008000006c <will_not_be_executed>:
+    8000006c:	02108157          	vadd.vv	v2,v1,v1
+	...
