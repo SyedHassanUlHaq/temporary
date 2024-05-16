@@ -9,8 +9,8 @@ Disassembly of section .text:
     80000002:	2005051b          	addiw	a0,a0,512 # 2200 <_start-0x7fffde00>
     80000006:	30052073          	csrs	mstatus,a0
     8000000a:	00f05073          	csrwi	vcsr,0
-    8000000e:	00003117          	auipc	sp,0x3
-    80000012:	ff210113          	addi	sp,sp,-14 # 80003000 <__stacktop>
+    8000000e:	00002117          	auipc	sp,0x2
+    80000012:	ff210113          	addi	sp,sp,-14 # 80002000 <__stacktop>
     80000016:	012000ef          	jal	80000028 <test>
     8000001a:	10000537          	lui	a0,0x10000
     8000001e:	55fd                	li	a1,-1
@@ -21,7 +21,7 @@ Disassembly of section .text:
 0000000080000028 <test>:
     80000028:	0085                	addi	ra,ra,1
     8000002a:	40000513          	li	a0,1024
-    8000002e:	0c300593          	li	a1,195
+    8000002e:	0c100593          	li	a1,193
     80000032:	4641                	li	a2,16
     80000034:	80b57057          	vsetvl	zero,a0,a1
     80000038:	6f05                	lui	t5,0x1
@@ -29,25 +29,26 @@ Disassembly of section .text:
 
 000000008000003e <add_test>:
     8000003e:	02053057          	vadd.vi	v0,v0,10
-    80000042:	0085b857          	vadd.vi	v16,v8,11,v0.t
-    80000046:	07000457          	vandn.vv	v8,v16,v0
-    8000004a:	0083b857          	vadd.vi	v16,v8,7,v0.t
-    8000004e:	0300c457          	vadd.vx	v8,v16,ra
+    80000042:	0005b157          	vadd.vi	v2,v0,11,v0.t
+    80000046:	06010257          	vandn.vv	v4,v0,v2
+    8000004a:	56410357          	vrol.vv	v6,v4,v2
+    8000004e:	00430457          	vadd.vv	v8,v4,v6,v0.t
+    80000052:	0300c457          	vadd.vx	v8,v16,ra
 
-0000000080000052 <chaining_test>:
-    80000052:	0300cc57          	vadd.vx	v24,v16,ra
-    80000056:	2f83b457          	vxor.vi	v8,v24,7
-    8000005a:	9680b857          	vsll.vi	v16,v8,1
-
-000000008000005e <ld_test>:
-    8000005e:	020f0807          	vle8.v	v16,(t5)
+0000000080000056 <chaining_test>:
+    80000056:	0300cc57          	vadd.vx	v24,v16,ra
+    8000005a:	2f83b457          	vxor.vi	v8,v24,7
+    8000005e:	9680b857          	vsll.vi	v16,v8,1
 
 0000000080000062 <loop>:
     80000062:	167d                	addi	a2,a2,-1
-    80000064:	fe69                	bnez	a2,8000003e <add_test>
+    80000064:	f271                	bnez	a2,80000028 <test>
     80000066:	b00022f3          	csrr	t0,mcycle
-    8000006a:	8082                	ret
+    8000006a:	00008067          	ret
 
-000000008000006c <will_not_be_executed>:
-    8000006c:	02108157          	vadd.vv	v2,v1,v1
+000000008000006e <ld_test>:
+    8000006e:	020f0807          	vle8.v	v16,(t5)
+
+0000000080000072 <will_not_be_executed>:
+    80000072:	02108157          	vadd.vv	v2,v1,v1
 	...
