@@ -16,7 +16,7 @@ Disassembly of section .text:
     8000001e:	057e                	slli	a0,a0,0x1f
     80000020:	55fd                	li	a1,-1
     80000022:	c14c                	sw	a1,4(a0)
-    80000024:	7cc05073          	csrwi	0x7cc,0
+    80000024:	00f05073          	csrwi	vcsr,0
 
 0000000080000028 <test>:
     80000028:	0085                	addi	ra,ra,1
@@ -43,7 +43,8 @@ Disassembly of section .text:
     80000066:	167d                	addi	a2,a2,-1
     80000068:	fa79                	bnez	a2,8000003e <zvbb_test>
     8000006a:	b00022f3          	csrr	t0,mcycle
-    8000006e:	00008067          	ret
+    8000006e:	8082                	ret
 
-0000000080000072 <will_not_be_executed>:
-    80000072:	02108157          	vadd.vv	v2,v1,v1
+0000000080000070 <will_not_be_executed>:
+    80000070:	02108157          	vadd.vv	v2,v1,v1
+	...
