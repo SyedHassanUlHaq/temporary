@@ -13,7 +13,7 @@ _start:
     li a0, 0x80000000
     li a1, -1
     sw a1, 4(a0)
-    csrwi 0x7cc, 0
+    csrwi vcsr, 0
 
     .p2align 2
 
@@ -47,7 +47,7 @@ loop:
     csrr t0, mcycle
 
     # Return to caller - Assume the return address is in ra (x1)
-    jalr x0, 0(x1)
+    ret
 
 will_not_be_executed:
     vadd.vv v2, v1, v1
